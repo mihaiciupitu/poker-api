@@ -17,7 +17,7 @@ io.on("connection", (socket) => {
   socket.on("Username", (username) => {
     console.log("The name is: ", username);
     socket.on("cardValue", (card) => {
-      console.log(`${content} selected`, card);
+      console.log(`${username} selected`, card);
       values.push(card);
       let s = 0;
       for (var i = 0; i < values.length; i++) {
@@ -27,7 +27,7 @@ io.on("connection", (socket) => {
       console.log("The average of the selected cards is : ", average);
       socket.emit("Average", average);
       socket.emit("Selected cards", values);
-      socket.emit("Username", username);
+      socket.emit("Usernames", username);
     });
   });
 
