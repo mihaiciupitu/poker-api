@@ -16,9 +16,11 @@ io.on("connection", (socket) => {
   console.log("Total users:", users);
   socket.on("Username", (username) => {
     console.log("The name is: ", username);
-    usersArr.push(username);
+    socket.username = username;
+    usersArr.push({ socketID: socket.id, name: username });
     socket.on("cardValue", (card) => {
       console.log(`${username} selected`, card);
+      io.emit("SelectedCard", card);
       values.push(card);
       let s = 0;
       for (var i = 0; i < values.length; i++) {
@@ -29,7 +31,12 @@ io.on("connection", (socket) => {
       socket.emit("Average", average);
       socket.emit("Selected cards", values);
     });
-    io.emit("Usernames", usersArr);
+    io.emit(
+      "Usernames",
+      usersArr.map((users) => {
+        return users.name;
+      })
+    );
   });
   socket.on("resetAverage", () => {
     values = [];
@@ -39,6 +46,14 @@ io.on("connection", (socket) => {
     console.log("User disconnected");
     users--;
     console.log("Users disconnected: ", users);
+    usersArr = usersArr.filter((user) => user.name !== socket.username);
+    console.log(usersArr.length);
+    io.emit(
+      "Usernames",
+      usersArr.map((users) => {
+        return users.name;
+      })
+    );
   });
 });
 
