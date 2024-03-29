@@ -9,13 +9,14 @@ const io = new Server(server, {
 });
 let users = 0;
 let values = [];
-
+let usersArr = [];
 io.on("connection", (socket) => {
   console.log("A user connected");
   users++;
   console.log("Total users:", users);
   socket.on("Username", (username) => {
     console.log("The name is: ", username);
+    usersArr.push(username);
     socket.on("cardValue", (card) => {
       console.log(`${username} selected`, card);
       values.push(card);
@@ -27,10 +28,13 @@ io.on("connection", (socket) => {
       console.log("The average of the selected cards is : ", average);
       socket.emit("Average", average);
       socket.emit("Selected cards", values);
-      socket.emit("Usernames", username);
     });
+    socket.emit("Usernames", usersArr);
   });
-
+  socket.on("resetAverage", () => {
+    values = [];
+    socket.emit("Average", 0);
+  });
   socket.on("disconnect", () => {
     console.log("User disconnected");
     users--;
