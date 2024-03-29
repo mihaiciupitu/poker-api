@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
       socket.emit("Average", average);
       socket.emit("Selected cards", values);
     });
-    socket.emit("Usernames", usersArr);
+    io.emit("Usernames", usersArr);
   });
   socket.on("resetAverage", () => {
     values = [];
