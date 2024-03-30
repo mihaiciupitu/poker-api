@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
       for (var i = 0; i < values.length; i++) {
         s += parseInt(values[i]);
       }
-      const average = parseInt(s) / values.length;
+      const average = parseInt(s) / values.length || 0;
       console.log("The average of the selected cards is : ", average);
       socket.emit("Average", average);
       socket.emit("Selected cards", values);
