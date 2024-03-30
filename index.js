@@ -29,7 +29,6 @@ io.on("connection", (socket) => {
       const average = parseInt(s) / values.length || 0;
       console.log("The average of the selected cards is : ", average);
       socket.emit("Average", average);
-      socket.emit("Selected cards", values);
     });
     io.emit(
       "Usernames",
