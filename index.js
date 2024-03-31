@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
     users--;
     console.log("Users disconnected: ", users);
     usersArr = usersArr.filter((user) => user.name !== socket.username);
-    console.log(usersArr.length);
+
     io.emit(
       "UsernamesConnected",
       usersArr.map((users) => {
