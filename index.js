@@ -14,7 +14,7 @@ io.on("connection", (socket) => {
   console.log("A user connected");
   users++;
   console.log("Total users:", users);
-  socket.on("Username", (username) => {
+  socket.on("SendUsername", (username) => {
     console.log("The name is: ", username);
     socket.username = username;
     usersArr.push({ socketID: socket.id, name: username });
@@ -31,7 +31,7 @@ io.on("connection", (socket) => {
       socket.emit("Average", average);
     });
     io.emit(
-      "Usernames",
+      "UsernamesConnected",
       usersArr.map((users) => {
         return users.name;
       })
@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
     usersArr = usersArr.filter((user) => user.name !== socket.username);
     console.log(usersArr.length);
     io.emit(
-      "Usernames",
+      "UsernamesConnected",
       usersArr.map((users) => {
         return users.name;
       })
