@@ -20,7 +20,12 @@ io.on("connection", (socket) => {
     usersArr.push({ socketID: socket.id, name: username });
     socket.on("cardValue", (card) => {
       console.log(`${username} selected`, card);
-      io.emit("SelectedCard", card);
+
+      io.emit("SelectedCard", {
+        socketID: socket.id,
+        name: username,
+        card: card,
+      });
       values.push(card);
       let s = 0;
       for (var i = 0; i < values.length; i++) {
@@ -33,7 +38,7 @@ io.on("connection", (socket) => {
     io.emit(
       "UsernamesConnected",
       usersArr.map((users) => {
-        return users.name;
+        return users;
       })
     );
   });
