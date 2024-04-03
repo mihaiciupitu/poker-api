@@ -7,59 +7,70 @@ const io = new Server(server, {
     origin: ["http://localhost:8080"],
   },
 });
+
 let users = 0;
-let values = [];
 let usersArr = [];
+let selectedCards = [];
+
 io.on("connection", (socket) => {
   console.log("A user connected");
   users++;
-  console.log("Total users:", users);
+  io.emit("totalUsers", users);
+
+  socket.on("updateCardValue", (content) => {
+    socket.broadcast.emit("updateCardValue", {
+      socketId: socket.id,
+      card: content.card,
+    });
+  });
+
   socket.on("SendUsername", (username) => {
     console.log("The name is: ", username);
     socket.username = username;
     usersArr.push({ socketID: socket.id, name: username });
-    socket.on("cardValue", (card) => {
-      console.log(`${username} selected`, card);
+    io.emit("UsernamesConnected", usersArr);
+  });
 
-      io.emit("SelectedCard", {
-        socketID: socket.id,
-        name: username,
-        card: card,
-      });
-      values.push(card);
-      let s = 0;
-      for (var i = 0; i < values.length; i++) {
-        s += parseInt(values[i]);
-      }
-      const average = parseInt(s) / values.length || 0;
-      console.log("The average of the selected cards is : ", average);
-      socket.emit("Average", average);
+  socket.on("cardValue", (card) => {
+    console.log(`${socket.username} selected`, card);
+    selectedCards.push(parseInt(card));
+
+    io.emit("SelectedCard", {
+      socketID: socket.id,
+      name: socket.username,
+      card: card,
     });
-    io.emit(
-      "UsernamesConnected",
-      usersArr.map((users) => {
-        return users;
-      })
-    );
+
+    const average = calculateAverage(selectedCards);
+    io.emit("Average", average);
   });
+
   socket.on("resetAverage", () => {
-    values = [];
-    socket.emit("Average", 0);
+    selectedCards = [];
+    const average = calculateAverage(selectedCards);
+    io.emit("Average", average);
   });
+
   socket.on("disconnect", () => {
     console.log("User disconnected");
     users--;
-    console.log("Users disconnected: ", users);
+    io.emit("totalUsers", users);
     usersArr = usersArr.filter((user) => user.name !== socket.username);
-
-    io.emit(
-      "UsernamesConnected",
-      usersArr.map((users) => {
-        return users.name;
-      })
-    );
+    io.emit("UsernamesConnected", usersArr);
   });
 });
+
+function calculateAverage(cards) {
+  if (cards.length === 0) {
+    return 0;
+  }
+
+  let sum = 0;
+  for (let i = 0; i < cards.length; i++) {
+    sum += cards[i];
+  }
+  return sum / cards.length;
+}
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
